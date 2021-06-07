@@ -158,48 +158,72 @@ fn helper_build_merkle_path(b: &[i32], idx: usize, out: &[H256]) -> Vec<Option<H
     return merkle_proof;
 }
 #[test]
-fn elements_belong_to_collection_size_power_of_two() {
-    let b = vec![1,2,3,4];
-    let idx: usize =  1;
-    let value = 2;
-    let out = gen_proof_(&b).unwrap();
-    let merkle_proof = helper_build_merkle_path(&b, idx, &out);
-    let root = out.last().copied().unwrap();
-    //println!("proof: {:?}", merkle_proof);
-    match verify_proof(&merkle_proof, value, idx, root) {
-        Ok(ans) => assert_eq!(ans, true),
-        Err(msg) => panic!(msg)
-    }
-}
-
-#[test]
-fn elements_belong_to_collection_even() {
-    let b = vec![1,2,3,4,5,6];
-    let idx: usize =  1;
-    let value = 2;
-    let out = gen_proof_(&b).unwrap();
-    let merkle_proof = helper_build_merkle_path(&b, idx, &out);
-    let root = out.last().copied().unwrap();
-    //println!("proof: {:?}", merkle_proof);
-    match verify_proof(&merkle_proof, value, idx, root) {
-        Ok(ans) => assert_eq!(ans, true),
-        Err(msg) => panic!(msg)
-    }
-}
-#[test]
-fn elements_belong_to_collection_odd() {
+fn elements_does_belong_to_collection_even() {
     let b = vec![1,2,3,4,5];
-    let idx: usize =  1;
     let value = 2;
     let out = gen_proof_(&b).unwrap();
-    let merkle_proof = helper_build_merkle_path(&b, idx, &out);
+    let mut res = false;
     let root = out.last().copied().unwrap();
-    //println!("proof: {:?}", merkle_proof);
-    match verify_proof(&merkle_proof, value, idx, root) {
-        Ok(ans) => assert_eq!(ans, true),
-        Err(msg) => panic!(msg)
+    for idx in 0..b.len() {
+        let merkle_proof = helper_build_merkle_path(&b, idx, &out);
+        //println!("proof: {:?}", merkle_proof);
+        match verify_proof(&merkle_proof, value, idx, root) {
+            Ok(ans) => res = res || ans,
+            Err(msg) => panic!(msg)
+        }
     }
+    assert_eq!(res, true)
 }
-
+#[test]
+fn elements_does_belong_to_collection_odd() {
+    let b = vec![1,2,3,4,5];
+    let value = 2;
+    let out = gen_proof_(&b).unwrap();
+    let root = out.last().copied().unwrap();
+    let mut res = false;
+    for idx in 0..b.len() {
+        let merkle_proof = helper_build_merkle_path(&b, idx, &out);
+        //println!("proof: {:?}", merkle_proof);
+        match verify_proof(&merkle_proof, value, idx, root) {
+            Ok(ans) => res = res || ans,
+            Err(msg) => panic!(msg)
+        }
+    }
+    assert_eq!(res, true)
+}
+#[test]
+fn elements_doesnt_belong_to_collection_odd() {
+    let b = vec![1,2,3,4,5];
+    let value = 20;
+    let out = gen_proof_(&b).unwrap();
+    let mut res = true;
+    let root = out.last().copied().unwrap();
+    for idx in 0..b.len() {
+        let merkle_proof = helper_build_merkle_path(&b, idx, &out);
+        //println!("proof: {:?}", merkle_proof);
+        match verify_proof(&merkle_proof, value, idx, root) {
+            Ok(ans) => res = res && ans,
+            Err(msg) => panic!(msg)
+        }
+    }
+    assert_eq!(res, false)
+}
+#[test]
+fn elements_doesnt_belong_to_collection_even() {
+    let b = vec![1,2,3,4,5];
+    let value = 20;
+    let out = gen_proof_(&b).unwrap();
+    let mut res = true;
+    let root = out.last().copied().unwrap();
+    for idx in 0..b.len() {
+        let merkle_proof = helper_build_merkle_path(&b, idx, &out);
+        //println!("proof: {:?}", merkle_proof);
+        match verify_proof(&merkle_proof, value, idx, root) {
+            Ok(ans) => res = res && ans,
+            Err(msg) => panic!(msg)
+        }
+    }
+    assert_eq!(res, false)
+}
 fn main() {}
 
